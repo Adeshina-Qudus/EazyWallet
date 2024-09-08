@@ -26,7 +26,8 @@ public class WalletServiceTest {
 
     @Test
     public void setUpWalletTest(){
-        SetUpWalletRequest setUpWalletRequest = setUpWalletRequest("Qudus Lekan","09079447913", "1234");
+        SetUpWalletRequest setUpWalletRequest = setUpWalletRequest("Qudus Lekan",
+                "09079447913", "1234");
         Wallet setUpWalletResponse =
                 walletService.setUpWallet(setUpWalletRequest);
         assertThat(setUpWalletResponse).isNotNull();

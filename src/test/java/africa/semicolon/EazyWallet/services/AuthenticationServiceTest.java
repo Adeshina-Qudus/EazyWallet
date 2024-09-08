@@ -25,16 +25,17 @@ public class AuthenticationServiceTest {
         registerRequest.setEmail(email);
         registerRequest.setPhoneNumber(phoneNumber);
         registerRequest.setPassword(password);
-        registerRequest.setPin(pin);
+        registerRequest.setWalletPin(pin);
         return registerRequest;
     }
+
 
 
     @Test
     public void registrationTest() throws NumberParseException {
         RegistrationRequest registrationRequest =
                 registerRequest("Qudus","Lekan","Qudusa55@gmail.com",
-                        "09079447913","1234","lonly at the top");
+                        "09079447913","lonely at the top","1234");
         RegistrationResponse registrationResponse =
                 authService. registration(registrationRequest);
         assertThat(registrationResponse).isNotNull();

@@ -27,9 +27,9 @@ public class EazyWalletAuthenticationService implements AuthenticationService {
     public RegistrationResponse registration(RegistrationRequest registrationRequest) throws NumberParseException {
         validateUserDetails(registrationRequest);
         userExist(registrationRequest);
-        SetUpWalletRequest setUpWalletRequest = getWalletInfo(registrationRequest.getPhoneNumber(),
+        SetUpWalletRequest setUpWalletRequest = getInfoToSetUpWallet(registrationRequest.getPhoneNumber(),
                 registrationRequest.getFirstName()+" "+registrationRequest.getLastName(),
-                registrationRequest.getPin());
+                registrationRequest.getWalletPin());
         Wallet wallet = walletService.setUpWallet(setUpWalletRequest);
         User user = User.builder()
                 .firstName(registrationRequest.getFirstName())
@@ -47,9 +47,9 @@ public class EazyWalletAuthenticationService implements AuthenticationService {
                 wallet.getBalance());
     }
 
-    private SetUpWalletRequest getWalletInfo(String phoneNumber, String s, String pin) {
+    private SetUpWalletRequest getInfoToSetUpWallet(String phoneNumber, String fullName, String pin) {
         SetUpWalletRequest setUpWalletRequest  = new SetUpWalletRequest();
-        setUpWalletRequest.setFullName(s);
+        setUpWalletRequest.setFullName(fullName);
         setUpWalletRequest.setAccountNumber(phoneNumber);
         setUpWalletRequest.setPin(pin);
         return setUpWalletRequest;
