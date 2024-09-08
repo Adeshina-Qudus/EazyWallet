@@ -1,5 +1,6 @@
 package africa.semicolon.EazyWallet.services;
 
+import africa.semicolon.EazyWallet.data.models.User;
 import africa.semicolon.EazyWallet.dtos.request.LoginRequest;
 import africa.semicolon.EazyWallet.dtos.request.RegistrationRequest;
 import africa.semicolon.EazyWallet.dtos.response.LoginResponse;
@@ -10,4 +11,6 @@ public interface AuthenticationService {
     RegistrationResponse registration(RegistrationRequest registrationRequest) throws NumberParseException;
 
     LoginResponse login(LoginRequest loginRequest);
+
+    User findUserByAccountNumber(String accountNumber);
 }

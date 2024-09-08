@@ -83,6 +83,14 @@ public class EazyWalletAuthenticationService implements AuthenticationService {
         return new LoginResponse("you're in ",accessTokenValue,refreshTokenValue);
     }
 
+    @Override
+    public User findUserByAccountNumber(String accountNumber) {
+        if (userRepository.findUserByPhoneNumber(accountNumber).isEmpty()){
+            throw new UserDoesntExistException("User Doesn't Exist");
+        }
+        return userRepository.findUserByPhoneNumber(accountNumber).get();
+    }
+
     private String accessToken() {
         Map responseMap = getToken();
         return responseMap.get("access_token").toString();
