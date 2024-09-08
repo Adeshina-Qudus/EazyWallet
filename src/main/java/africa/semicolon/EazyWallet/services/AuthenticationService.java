@@ -1,4 +1,4 @@
-package africa.semicolon.EazyWallet.service;
+package africa.semicolon.EazyWallet.services;
 
 import africa.semicolon.EazyWallet.dtos.request.RegistrationRequest;
 import africa.semicolon.EazyWallet.dtos.response.RegistrationResponse;

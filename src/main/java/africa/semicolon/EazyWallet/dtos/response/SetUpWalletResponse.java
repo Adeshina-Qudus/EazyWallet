@@ -2,17 +2,14 @@ package africa.semicolon.EazyWallet.dtos.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.math.BigDecimal;
 
 @Setter
 @Getter
 @AllArgsConstructor
-public class RegistrationResponse {
+@NoArgsConstructor
+public class SetUpWalletResponse {
 
     private String message;
-    private String accountNumber;
-    private BigDecimal balance;
-
 }
