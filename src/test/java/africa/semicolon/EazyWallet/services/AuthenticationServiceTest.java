@@ -1,13 +1,17 @@
 package africa.semicolon.EazyWallet.services;
 
+import africa.semicolon.EazyWallet.dtos.request.LoginRequest;
 import africa.semicolon.EazyWallet.dtos.request.RegistrationRequest;
+import africa.semicolon.EazyWallet.dtos.response.LoginResponse;
 import africa.semicolon.EazyWallet.dtos.response.RegistrationResponse;
+import africa.semicolon.EazyWallet.exception.*;
 import com.google.i18n.phonenumbers.NumberParseException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 public class AuthenticationServiceTest {
@@ -30,14 +34,62 @@ public class AuthenticationServiceTest {
     }
 
 
+    public LoginRequest loginRequest(String email , String password){
+        LoginRequest loginRequest =
+                new LoginRequest();
+            loginRequest.setEmail(email);
+            loginRequest.setPassword(password);
+        return loginRequest;
+    }
+
 
     @Test
     public void registrationTest() throws NumberParseException {
         RegistrationRequest registrationRequest =
-                registerRequest("Qudus","Lekan","Qudusa55@gmail.com",
+                registerRequest("Qudus","Lekan","qudusa55@gmail.com",
                         "09079447913","lonely at the top","1234");
         RegistrationResponse registrationResponse =
                 authService. registration(registrationRequest);
         assertThat(registrationResponse).isNotNull();
+    }
+
+    @Test
+    public void cannotCompleteRegistrationWithExistingUserEmailTest() throws NumberParseException {
+        RegistrationRequest registrationRequest =
+                registerRequest("ayo", "emele" ,"qudusa55@gmail.com",
+                        "08135347913","EmeleJnr","1234");
+        assertThrows(UserWithEmailAlreadyExistException.class,()->
+                authService.registration(registrationRequest));
+    }
+
+    @Test
+    public void cannotCompleteRegistrationWithExistingUserPhoneNumberTest() throws NumberParseException {
+        RegistrationRequest registrationRequest =
+                registerRequest("ayo", "emele" ,"qudusa355@gmail.com",
+                        "09079447913","EmeleJnr","1234");
+        assertThrows(UserWithPhoneNumberAlreadyExistException.class,()->
+                authService.registration(registrationRequest));
+    }
+
+    @Test
+    public void loginTest(){
+        LoginRequest loginRequest =
+                loginRequest("qudusa55@gmail.com","lonely at the top");
+        LoginResponse loginResponse = authService.login(loginRequest);
+        assertThat(loginResponse).isNotNull();
+    }
+
+    @Test
+    public void loginWithWrongEmailTest(){
+        LoginRequest loginRequest=
+                loginRequest("qudusa5@gmail.com","lonely at the top");
+        assertThrows(UserDoesntExistException.class, ()-> authService.login(loginRequest));
+    }
+
+    @Test
+    public void loginWithWrongPasswordTest(){
+        LoginRequest loginRequest=
+                loginRequest("qudusa55@gmail.com","lonelyat the top");
+        assertThrows(IncorrectPasswordException.class, ()-> authService.login(loginRequest));
     }
 }

@@ -32,4 +32,6 @@ public class WalletServiceTest {
                 walletService.setUpWallet(setUpWalletRequest);
         assertThat(setUpWalletResponse).isNotNull();
     }
+
+
 }
