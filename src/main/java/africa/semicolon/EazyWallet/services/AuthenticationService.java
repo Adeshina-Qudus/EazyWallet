@@ -13,4 +13,6 @@ public interface AuthenticationService {
     LoginResponse login(LoginRequest loginRequest);
 
     User findUserByAccountNumber(String accountNumber);
+
+    void saveUser(User user);
 }

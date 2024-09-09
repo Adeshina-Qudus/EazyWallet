@@ -11,4 +11,5 @@ public class FundWalletRequest {
 
     private String accountNumber;
     private String amount;
+    private String pin;
 }

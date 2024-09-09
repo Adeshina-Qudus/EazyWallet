@@ -6,10 +6,7 @@ import africa.semicolon.EazyWallet.dtos.response.InitializeTransactionResponse;
 import africa.semicolon.EazyWallet.dtos.response.VerifyTransactionResponse;
 import africa.semicolon.EazyWallet.services.PayStackService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -35,11 +32,16 @@ public class EazyWalletPayStackService implements PayStackService {
 
     @Override
     public VerifyTransactionResponse verifyTransaction(String reference) {
-        return null;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + paystackConfig.getPaystackApiKey());
+        String url = paystackConfig.getPaystackVerifyUrl() + reference;
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        return restTemplate.exchange(url, HttpMethod.GET, entity, VerifyTransactionResponse.class).getBody();
     }
 
-    private HttpEntity<InitializeTransactionRequest> buildInitializer(InitializeTransactionRequest
-                                                                              initializeTransactionRequest) {
+    private HttpEntity<InitializeTransactionRequest> buildInitializer(InitializeTransactionRequest initializeTransactionRequest) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(HttpHeaders.AUTHORIZATION,"Bearer "+paystackConfig.getPaystackApiKey());

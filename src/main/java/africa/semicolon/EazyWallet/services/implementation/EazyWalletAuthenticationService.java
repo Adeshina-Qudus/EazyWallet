@@ -14,6 +14,7 @@ import africa.semicolon.EazyWallet.services.WalletService;
 import com.google.i18n.phonenumbers.NumberParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -30,7 +31,9 @@ public class EazyWalletAuthenticationService implements AuthenticationService {
 
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
+    @Lazy
     private WalletService walletService;
 
     @Value("${spring.security.oauth2.authorizationserver.endpoint.token-uri}")
@@ -89,6 +92,11 @@ public class EazyWalletAuthenticationService implements AuthenticationService {
             throw new UserDoesntExistException("User Doesn't Exist");
         }
         return userRepository.findUserByPhoneNumber(accountNumber).get();
+    }
+
+    @Override
+    public void saveUser(User user) {
+        userRepository.save(user);
     }
 
     private String accessToken() {

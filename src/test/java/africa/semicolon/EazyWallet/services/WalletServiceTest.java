@@ -26,11 +26,12 @@ public class WalletServiceTest {
         return setUpWalletRequest;
     }
 
-    public FundWalletRequest fundWalletRequest(String accountNumber , String amount ){
+    public FundWalletRequest fundWalletRequest(String accountNumber , String amount ,String pin ){
         FundWalletRequest fundWalletRequest =
                 new FundWalletRequest();
                 fundWalletRequest.setAccountNumber(accountNumber);
                 fundWalletRequest.setAmount(amount);
+                fundWalletRequest.setPin(pin);
         return fundWalletRequest;
     }
 
@@ -46,7 +47,7 @@ public class WalletServiceTest {
     @Test
     public void fundWalletTest(){
         FundWalletRequest fundWalletRequest = fundWalletRequest("09079447913",
-                "4000");
+                "4000","1234");
         FundWalletResponse fundWalletResponse =
                 walletService.fundWallet(fundWalletRequest);
         assertThat(fundWalletResponse).isNotNull();
