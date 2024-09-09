@@ -18,7 +18,7 @@ public class EazyWalletPayStackService implements PayStackService {
 
 
     @Override
-    public InitializeTransactionResponse initializeTransfer(InitializeTransactionRequest initializeTransactionRequest) {
+    public InitializeTransactionResponse initializeTransaction(InitializeTransactionRequest initializeTransactionRequest) {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<InitializeTransactionRequest> transactionRequest =

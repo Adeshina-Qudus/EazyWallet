@@ -1,7 +1,6 @@
 package africa.semicolon.EazyWallet.services.implementation;
 
 
-import africa.semicolon.EazyWallet.data.models.Status;
 import africa.semicolon.EazyWallet.data.models.Transaction;
 import africa.semicolon.EazyWallet.data.models.User;
 import africa.semicolon.EazyWallet.data.models.Wallet;
@@ -12,6 +11,7 @@ import africa.semicolon.EazyWallet.dtos.request.SetUpWalletRequest;
 import africa.semicolon.EazyWallet.dtos.response.FundWalletResponse;
 import africa.semicolon.EazyWallet.dtos.response.InitializeTransactionResponse;
 import africa.semicolon.EazyWallet.dtos.response.VerifyTransactionResponse;
+import africa.semicolon.EazyWallet.dtos.response.CheckBalanceResponse;
 import africa.semicolon.EazyWallet.exception.IncorrectPasswordException;
 import africa.semicolon.EazyWallet.exception.WalletAlreadyExistException;
 import africa.semicolon.EazyWallet.services.AuthenticationService;
@@ -43,6 +43,7 @@ public class EazyWalletService implements WalletService {
         walletExist(setUpWalletRequest);
 
             Wallet wallet = Wallet.builder()
+
                         .walletAccountName(setUpWalletRequest.getFullName())
                         .walletAccountNumber(setUpWalletRequest.getAccountNumber())
                         .balance(BigDecimal.valueOf(0))
@@ -57,41 +58,21 @@ public class EazyWalletService implements WalletService {
     public FundWalletResponse fundWallet(FundWalletRequest fundWalletRequest) {
         User user =  authService.findUserByAccountNumber(fundWalletRequest.getAccountNumber());
         if (! user.getWallet().getPin().equals(
-                fundWalletRequest.getPin())) throw new IncorrectPasswordException("Incorrect Password");
+                fundWalletRequest.getPin())) throw new IncorrectPasswordException("Incorrect Pin");
         InitializeTransactionRequest initializeTransactionRequest =
-                initializeTransaction(user.getEmail(),fundWalletRequest);
-        InitializeTransactionResponse response = paystackService.initializeTransfer(initializeTransactionRequest);
+                transactionService.setUpTransactionRequest(user.getEmail(),fundWalletRequest);
+        InitializeTransactionResponse response = paystackService.initializeTransaction(initializeTransactionRequest);
         VerifyTransactionResponse verifyTransactionResponse =
                 paystackService.verifyTransaction(response.getData().getReference());
-        Transaction transaction = new Transaction();
-        transaction.setUserId(user.getId());
-        transaction.setWallet(user.getWallet());
-        transaction.setAmount(verifyTransactionResponse.getData().getAmount());
-        if (verifyTransactionResponse.getData().getStatus().equals("success")){
-            updatingTransactions(transaction, verifyTransactionResponse, user);
-        }else {
-            transaction.setStatus(Status.FAILED);
-        }
-        transactionService.saveTransaction(transaction);
+        Transaction transaction = transactionService.buildTransaction(user, verifyTransactionResponse,fundWalletRequest.getAmount());
         walletRepository.save(user.getWallet());
-        authService.saveUser(user);
         return new FundWalletResponse(transaction,user.getWallet().getBalance());
     }
 
-    private static void updatingTransactions(Transaction transaction, VerifyTransactionResponse verifyTransactionResponse, User user) {
-        transaction.setPaidAt(verifyTransactionResponse.getData().getPaid_at());
-        transaction.setStatus(Status.SUCCESSFUL);
-        user.getWallet().setBalance(user.getWallet().getBalance().add(verifyTransactionResponse.getData().getAmount()));
-    }
-
-    private InitializeTransactionRequest initializeTransaction(String email, FundWalletRequest fundWalletRequest) {
-        InitializeTransactionRequest initializeTransactionRequest =
-                new InitializeTransactionRequest();
-        initializeTransactionRequest.setEmail(email);
-        initializeTransactionRequest.setAmount(BigDecimal.valueOf(
-                Integer.parseInt(fundWalletRequest.getAmount()))
-                .multiply(BigDecimal.valueOf(100)));
-        return initializeTransactionRequest;
+    @Override
+    public CheckBalanceResponse checkBalance(Long userId) {
+        User user = authService.findUserById(userId);
+        return new CheckBalanceResponse(user.getWallet().getBalance());
     }
 
     private void walletExist(SetUpWalletRequest setUpWalletRequest) {

@@ -14,5 +14,5 @@ public interface AuthenticationService {
 
     User findUserByAccountNumber(String accountNumber);
 
-    void saveUser(User user);
+    User findUserById(Long userId);
 }

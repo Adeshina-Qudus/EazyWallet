@@ -56,6 +56,7 @@ public class EazyWalletAuthenticationService implements AuthenticationService {
                 registrationRequest.getWalletPin());
         Wallet wallet = walletService.setUpWallet(setUpWalletRequest);
         User user = User.builder()
+
                 .firstName(registrationRequest.getFirstName())
                 .lastName(registrationRequest.getLastName())
                 .email(registrationRequest.getEmail())
@@ -95,9 +96,14 @@ public class EazyWalletAuthenticationService implements AuthenticationService {
     }
 
     @Override
-    public void saveUser(User user) {
-        userRepository.save(user);
+    public User findUserById(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()){
+            throw new UserDoesntExistException("Account doesn't exist ");
+        }
+        return user.get();
     }
+
 
     private String accessToken() {
         Map responseMap = getToken();

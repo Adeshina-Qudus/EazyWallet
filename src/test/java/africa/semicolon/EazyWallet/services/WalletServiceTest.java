@@ -4,10 +4,12 @@ import africa.semicolon.EazyWallet.data.models.Wallet;
 import africa.semicolon.EazyWallet.dtos.request.FundWalletRequest;
 import africa.semicolon.EazyWallet.dtos.request.SetUpWalletRequest;
 import africa.semicolon.EazyWallet.dtos.response.FundWalletResponse;
-import africa.semicolon.EazyWallet.dtos.response.SetUpWalletResponse;
+import africa.semicolon.EazyWallet.dtos.response.CheckBalanceResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +28,7 @@ public class WalletServiceTest {
         return setUpWalletRequest;
     }
 
-    public FundWalletRequest fundWalletRequest(String accountNumber , String amount ,String pin ){
+    public FundWalletRequest fundWalletRequest(String accountNumber , BigDecimal amount , String pin ){
         FundWalletRequest fundWalletRequest =
                 new FundWalletRequest();
                 fundWalletRequest.setAccountNumber(accountNumber);
@@ -47,11 +49,17 @@ public class WalletServiceTest {
     @Test
     public void fundWalletTest(){
         FundWalletRequest fundWalletRequest = fundWalletRequest("09079447913",
-                "4000","1234");
+                BigDecimal.valueOf(4000),"1234");
         FundWalletResponse fundWalletResponse =
                 walletService.fundWallet(fundWalletRequest);
         assertThat(fundWalletResponse).isNotNull();
+    }
 
+    @Test
+    public void checkBalanceTest(){
+        Long userId =  1L;
+        CheckBalanceResponse balanceResponse = walletService.checkBalance(userId);
+        assertThat(balanceResponse).isNotNull();
     }
 
 }

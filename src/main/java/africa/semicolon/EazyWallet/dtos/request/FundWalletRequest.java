@@ -3,6 +3,8 @@ package africa.semicolon.EazyWallet.dtos.request;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Setter
 @Getter
 
@@ -10,6 +12,6 @@ import lombok.Setter;
 public class FundWalletRequest {
 
     private String accountNumber;
-    private String amount;
+    private BigDecimal amount;
     private String pin;
 }

@@ -6,7 +6,7 @@ import africa.semicolon.EazyWallet.dtos.response.VerifyTransactionResponse;
 
 public interface PayStackService {
 
-    InitializeTransactionResponse initializeTransfer(InitializeTransactionRequest initializeTransactionRequest);
+    InitializeTransactionResponse initializeTransaction(InitializeTransactionRequest initializeTransactionRequest);
 
     VerifyTransactionResponse verifyTransaction(String reference);
 }
