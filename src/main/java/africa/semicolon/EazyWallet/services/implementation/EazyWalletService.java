@@ -45,7 +45,7 @@ public class EazyWalletService implements WalletService {
             Wallet wallet = Wallet.builder()
                         .walletAccountName(setUpWalletRequest.getFullName())
                         .walletAccountNumber(setUpWalletRequest.getAccountNumber())
-                        .balance(BigDecimal.valueOf(0.0))
+                        .balance(BigDecimal.valueOf(0))
                         .pin(setUpWalletRequest.getPin())
                         .build();
 
@@ -66,21 +66,21 @@ public class EazyWalletService implements WalletService {
         Transaction transaction = new Transaction();
         transaction.setUserId(user.getId());
         transaction.setWallet(user.getWallet());
+        transaction.setAmount(verifyTransactionResponse.getData().getAmount());
         if (verifyTransactionResponse.getData().getStatus().equals("success")){
-            transactions(transaction, verifyTransactionResponse, user);
+            updatingTransactions(transaction, verifyTransactionResponse, user);
         }else {
             transaction.setStatus(Status.FAILED);
         }
         transactionService.saveTransaction(transaction);
         walletRepository.save(user.getWallet());
         authService.saveUser(user);
-        return new FundWalletResponse("??????????",transaction,user.getWallet().getBalance());
+        return new FundWalletResponse(transaction,user.getWallet().getBalance());
     }
 
-    private static void transactions(Transaction transaction, VerifyTransactionResponse verifyTransactionResponse, User user) {
+    private static void updatingTransactions(Transaction transaction, VerifyTransactionResponse verifyTransactionResponse, User user) {
         transaction.setPaidAt(verifyTransactionResponse.getData().getPaid_at());
         transaction.setStatus(Status.SUCCESSFUL);
-        transaction.setAmount(verifyTransactionResponse.getData().getAmount());
         user.getWallet().setBalance(user.getWallet().getBalance().add(verifyTransactionResponse.getData().getAmount()));
     }
 

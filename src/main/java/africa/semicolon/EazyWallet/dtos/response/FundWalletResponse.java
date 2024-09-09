@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class FundWalletResponse {
 
-    private String message;
     private Transaction transactionDetails;
     private BigDecimal walletBalance;
 }
