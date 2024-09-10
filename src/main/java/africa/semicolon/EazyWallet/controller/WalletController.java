@@ -31,9 +31,9 @@ public class WalletController {
         }
     }
 
-    @GetMapping("checkBalance")
+    @GetMapping("checkBalance/{id}")
     @PreAuthorize("hasRole('client_user')")
-    public ResponseEntity<?> checkBalance(@PathVariable("id") Long id ){
+    public ResponseEntity<?> checkBalance(@PathVariable Long id ){
         try{
             CheckBalanceResponse checkBalanceResponse =
                     walletService.checkBalance(id);

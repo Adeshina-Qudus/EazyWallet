@@ -23,5 +23,6 @@ public class Wallet {
     private String walletAccountName;
     private String walletAccountNumber;
     private BigDecimal balance;
+    private String email;
     private String pin;
 }

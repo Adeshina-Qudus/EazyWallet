@@ -3,6 +3,7 @@ package africa.semicolon.EazyWallet.services.implementation;
 import africa.semicolon.EazyWallet.data.models.Status;
 import africa.semicolon.EazyWallet.data.models.Transaction;
 import africa.semicolon.EazyWallet.data.models.User;
+import africa.semicolon.EazyWallet.data.models.Wallet;
 import africa.semicolon.EazyWallet.data.repository.TransactionRepository;
 import africa.semicolon.EazyWallet.dtos.request.FundWalletRequest;
 import africa.semicolon.EazyWallet.dtos.request.InitializeTransactionRequest;
@@ -22,15 +23,15 @@ public class EazyWalletTransactionService implements TransactionService {
 
 
     @Override
-    public Transaction buildTransaction(User user, VerifyTransactionResponse
+    public Transaction buildTransaction(Wallet wallet, VerifyTransactionResponse
             verifyTransactionResponse, BigDecimal amount) {
 
         Transaction transaction = new Transaction();
-        transaction.setUserId(user.getId());
-        transaction.setWallet(user.getWallet());
+        transaction.setUserId(wallet.getId());
+        transaction.setWallet(wallet);
         transaction.setAmount(amount);
         if (verifyTransactionResponse.getData().getStatus().equals("success")){
-            updatingTransactions(transaction, verifyTransactionResponse, user);
+            updatingTransactions(transaction, verifyTransactionResponse, wallet);
         }else {
             transaction.setStatus(Status.FAILED);
         }
@@ -49,9 +50,9 @@ public class EazyWalletTransactionService implements TransactionService {
         return initializeTransactionRequest;
     }
 
-    private static void updatingTransactions(Transaction transaction, VerifyTransactionResponse verifyTransactionResponse, User user) {
+    private static void updatingTransactions(Transaction transaction, VerifyTransactionResponse verifyTransactionResponse, Wallet wallet) {
         transaction.setPaidAt(verifyTransactionResponse.getData().getPaid_at());
         transaction.setStatus(Status.SUCCESSFUL);
-        user.getWallet().setBalance(user.getWallet().getBalance().add(verifyTransactionResponse.getData().getAmount()));
+        wallet.setBalance(wallet.getBalance().add(verifyTransactionResponse.getData().getAmount()));
     }
 }

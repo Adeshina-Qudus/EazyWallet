@@ -14,6 +14,7 @@ import africa.semicolon.EazyWallet.dtos.response.VerifyTransactionResponse;
 import africa.semicolon.EazyWallet.dtos.response.CheckBalanceResponse;
 import africa.semicolon.EazyWallet.exception.IncorrectPasswordException;
 import africa.semicolon.EazyWallet.exception.WalletAlreadyExistException;
+import africa.semicolon.EazyWallet.exception.WalletDoesntExistException;
 import africa.semicolon.EazyWallet.services.AuthenticationService;
 import africa.semicolon.EazyWallet.services.PayStackService;
 import africa.semicolon.EazyWallet.services.TransactionService;
@@ -22,15 +23,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 public class EazyWalletService implements WalletService {
 
     @Autowired
     private WalletRepository walletRepository;
-
-    @Autowired
-    private AuthenticationService authService;
 
     @Autowired
     private PayStackService paystackService;
@@ -46,6 +45,7 @@ public class EazyWalletService implements WalletService {
 
                         .walletAccountName(setUpWalletRequest.getFullName())
                         .walletAccountNumber(setUpWalletRequest.getAccountNumber())
+                        .email(setUpWalletRequest.getEmail())
                         .balance(BigDecimal.valueOf(0))
                         .pin(setUpWalletRequest.getPin())
                         .build();
@@ -56,23 +56,31 @@ public class EazyWalletService implements WalletService {
 
     @Override
     public FundWalletResponse fundWallet(FundWalletRequest fundWalletRequest) {
-        User user =  authService.findUserByAccountNumber(fundWalletRequest.getAccountNumber());
-        if (! user.getWallet().getPin().equals(
+        Optional<Wallet> wallet =  walletRepository.findWalletByWalletAccountNumber(fundWalletRequest.getAccountNumber());
+        checkIfWalletExist(wallet);
+        if (wallet.get().getPin().equals(
                 fundWalletRequest.getPin())) throw new IncorrectPasswordException("Incorrect Pin");
         InitializeTransactionRequest initializeTransactionRequest =
-                transactionService.setUpTransactionRequest(user.getEmail(),fundWalletRequest);
+                transactionService.setUpTransactionRequest(wallet.get().getEmail(),fundWalletRequest);
         InitializeTransactionResponse response = paystackService.initializeTransaction(initializeTransactionRequest);
         VerifyTransactionResponse verifyTransactionResponse =
                 paystackService.verifyTransaction(response.getData().getReference());
-        Transaction transaction = transactionService.buildTransaction(user, verifyTransactionResponse,fundWalletRequest.getAmount());
-        walletRepository.save(user.getWallet());
-        return new FundWalletResponse(transaction,user.getWallet().getBalance());
+        Transaction transaction = transactionService.buildTransaction(wallet.get(), verifyTransactionResponse,fundWalletRequest.getAmount());
+        walletRepository.save(wallet.get());
+        return new FundWalletResponse(transaction,wallet.get().getBalance());
     }
 
     @Override
     public CheckBalanceResponse checkBalance(Long userId) {
-        User user = authService.findUserById(userId);
-        return new CheckBalanceResponse(user.getWallet().getBalance());
+        Optional<Wallet> wallet = walletRepository.findById(userId);
+        checkIfWalletExist(wallet);
+        return new CheckBalanceResponse(wallet.get().getBalance());
+    }
+
+    private static void checkIfWalletExist(Optional<Wallet> wallet) {
+        if (wallet.isEmpty()){
+            throw new WalletDoesntExistException("Wallet Not Found");
+        }
     }
 
     private void walletExist(SetUpWalletRequest setUpWalletRequest) {

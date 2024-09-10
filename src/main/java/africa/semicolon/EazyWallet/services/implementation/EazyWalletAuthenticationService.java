@@ -1,5 +1,4 @@
 package africa.semicolon.EazyWallet.services.implementation;
-
 import africa.semicolon.EazyWallet.data.models.User;
 import africa.semicolon.EazyWallet.data.models.Wallet;
 import africa.semicolon.EazyWallet.data.repository.UserRepository;
@@ -20,11 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.Map;
 import java.util.Optional;
-
 import static africa.semicolon.EazyWallet.utils.Validation.validateUserDetails;
+
+
 
 @Service
 public class EazyWalletAuthenticationService implements AuthenticationService {
@@ -33,7 +32,7 @@ public class EazyWalletAuthenticationService implements AuthenticationService {
     private UserRepository userRepository;
 
     @Autowired
-    @Lazy
+//    @Lazy
     private WalletService walletService;
 
     @Value("${spring.security.oauth2.authorizationserver.endpoint.token-uri}")
@@ -53,7 +52,7 @@ public class EazyWalletAuthenticationService implements AuthenticationService {
         userExist(registrationRequest);
         SetUpWalletRequest setUpWalletRequest = getInfoToSetUpWallet(registrationRequest.getPhoneNumber(),
                 registrationRequest.getFirstName()+" "+registrationRequest.getLastName(),
-                registrationRequest.getWalletPin());
+                registrationRequest.getWalletPin(),registrationRequest.getEmail());
         Wallet wallet = walletService.setUpWallet(setUpWalletRequest);
         User user = User.builder()
 
@@ -131,11 +130,12 @@ public class EazyWalletAuthenticationService implements AuthenticationService {
         return responseEntity.getBody();
     }
 
-    private SetUpWalletRequest getInfoToSetUpWallet(String phoneNumber, String fullName, String pin) {
+    private SetUpWalletRequest getInfoToSetUpWallet(String phoneNumber, String fullName, String pin , String email) {
         SetUpWalletRequest setUpWalletRequest  = new SetUpWalletRequest();
         setUpWalletRequest.setFullName(fullName);
         setUpWalletRequest.setAccountNumber(phoneNumber);
         setUpWalletRequest.setPin(pin);
+        setUpWalletRequest.setEmail(email);
         return setUpWalletRequest;
     }
 

@@ -47,17 +47,25 @@ public class AuthenticationServiceTest {
     public void registrationTest() throws NumberParseException {
         RegistrationRequest registrationRequest =
                 registerRequest("Qudus","Lekan","qudusa55@gmail.com",
-                        "09079447913","lonely at the top","1234");
+                        "09079447913","Iniestajnr1$","1234");
         RegistrationResponse registrationResponse =
                 authService. registration(registrationRequest);
         assertThat(registrationResponse).isNotNull();
+    }
+    @Test
+    public void registrationWithWrongPasswordFormatTest() throws NumberParseException {
+        RegistrationRequest registrationRequest =
+                registerRequest("Qudus","Lekan","qudusa55@gmail.com",
+                        "09079447913","Iniestajnr","1234");
+        assertThrows(InvalidDetailsException.class, ()->
+                       authService. registration(registrationRequest));
     }
 
     @Test
     public void cannotCompleteRegistrationWithExistingUserEmailTest() throws NumberParseException {
         RegistrationRequest registrationRequest =
                 registerRequest("ayo", "emele" ,"qudusa55@gmail.com",
-                        "08135347913","EmeleJnr","1234");
+                        "08135347913","Iniestajnr1$","1234");
         assertThrows(UserWithEmailAlreadyExistException.class,()->
                 authService.registration(registrationRequest));
     }
@@ -66,7 +74,7 @@ public class AuthenticationServiceTest {
     public void cannotCompleteRegistrationWithExistingUserPhoneNumberTest() throws NumberParseException {
         RegistrationRequest registrationRequest =
                 registerRequest("ayo", "emele" ,"qudusa355@gmail.com",
-                        "09079447913","EmeleJnr","1234");
+                        "09079447913","EmeleJnr1$","1234");
         assertThrows(UserWithPhoneNumberAlreadyExistException.class,()->
                 authService.registration(registrationRequest));
     }
@@ -74,7 +82,7 @@ public class AuthenticationServiceTest {
     @Test
     public void loginTest(){
         LoginRequest loginRequest =
-                loginRequest("qudusa55@gmail.com","lonely at the top");
+                loginRequest("qudusa55@gmail.com","Iniestajnr1$");
         LoginResponse loginResponse = authService.login(loginRequest);
         assertThat(loginResponse).isNotNull();
     }
@@ -82,14 +90,14 @@ public class AuthenticationServiceTest {
     @Test
     public void loginWithWrongEmailTest(){
         LoginRequest loginRequest=
-                loginRequest("qudusa5@gmail.com","lonely at the top");
+                loginRequest("qudusa5@gmail.com","Iniestajnr1$");
         assertThrows(UserDoesntExistException.class, ()-> authService.login(loginRequest));
     }
 
     @Test
     public void loginWithWrongPasswordTest(){
         LoginRequest loginRequest=
-                loginRequest("qudusa55@gmail.com","lonelyat the top");
+                loginRequest("qudusa55@gmail.com","Iniestajnr1");
         assertThrows(IncorrectPasswordException.class, ()-> authService.login(loginRequest));
     }
 }

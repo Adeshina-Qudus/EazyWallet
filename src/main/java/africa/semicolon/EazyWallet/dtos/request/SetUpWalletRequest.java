@@ -11,5 +11,6 @@ public class SetUpWalletRequest {
 
     private String fullName;
     private String accountNumber;
+    private String email;
     private String pin;
 }
